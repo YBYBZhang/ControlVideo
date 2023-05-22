@@ -19,7 +19,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 
 <table class="center">
 <tr>
-  <td width=30% align="center"><img src="assets/depth/A_charming_flamingo_gracefully_wanders_in_the_calm_and_serene_water,_its_delicate_neck_curving_into_an_elegant_shape..mp4" raw=true></td>
+  <td width=30% align="center"><video controls autoplay src="assets/depth/A_charming_flamingo_gracefully_wanders_in_the_calm_and_serene_water,_its_delicate_neck_curving_into_an_elegant_shape..mp4" type="video/mp4"></video></td>
 	<td width=30% align="center"><img src="assets/depth/A_striking_mallard_floats_effortlessly_on_the_sparkling_pond..mp4" raw=true></td>
   <td width=30% align="center"><img src="assets/depth/A_gigantic_yellow_jeep_slowly_turns_on_a_wide,_smooth_road_in_the_city..mp4" raw=true></td>
 </tr>
