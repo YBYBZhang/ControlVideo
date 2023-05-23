@@ -9,7 +9,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 
 ## News
 
-* [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/xx) released!
+* [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/2305.13077) released!
 
   
 
