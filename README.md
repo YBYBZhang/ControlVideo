@@ -43,13 +43,15 @@ To perform text-to-video generation, just run this command in `inference.sh`:
 ```bash
 python inference.py \
     --prompt "A striking mallard floats effortlessly on the sparkling pond." \
+    --condition "depth" \
     --video_path "data/mallard-water.mp4" \
     --output_path "outputs/" \
     --video_length 15 \
     --smoother_steps 19 20 \
     # --is_long_video
 ```
-where `--video_length` is the length of synthesized video, `--smoother_steps` determines at which timesteps to perform smoothing, `--is_long_video` denotes whether to enable efficient long-video synthesis.
+where `--video_length` is the length of synthesized video, `--condition` represents the type of structure sequence,
+`--smoother_steps` determines at which timesteps to perform smoothing, and `--is_long_video` denotes whether to enable efficient long-video synthesis.
 
 ## Visualizations
 
