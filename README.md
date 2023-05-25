@@ -1,17 +1,55 @@
 # ControlVideo
 
 Official pytorch implementation of "ControlVideo: Training-free Controllable Text-to-Video Generation"
-
-**Code will come soon in next few days.**
-
-
-
+[![arXiv](https://img.shields.io/badge/arXiv-2305.13077-b31b1b.svg)](https://arxiv.org/abs/2305.13077)
+<p align="center">
+<img src="assets/overview.png" width="1080px"/> 
+<br>
+<em>ControlVideo adapts ControlNet to the video counterpart without any finetuning, aiming to directly inherit its high-quality and consistent generation </em>
+</p>
 
 ## News
 
+* [05/25/2023] Code [ControlVideo](https://github.com/YBYBZhang/ControlVideo/) released!
 * [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/2305.13077) released!
 
-  
+## Setup
+
+### 1. Download Weights
+All pre-trained weights are downloaded to `checkpoints/` directory, including the pre-trained weights of [Stable Diffusion v1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5), ControlNet conditioned on [canny edges](https://huggingface.co/lllyasviel/sd-controlnet-canny), [depth maps](https://huggingface.co/lllyasviel/sd-controlnet-depth), [human poses](https://huggingface.co/lllyasviel/sd-controlnet-openpose). 
+The `flownet.pkl` is the weights of [RIFE](https://github.com/megvii-research/ECCV2022-RIFE).
+The final file tree likes:
+
+```none
+datasets
+├── stable-diffusion-v1-5
+├── sd-controlnet-canny
+├── sd-controlnet-depth
+├── sd-controlnet-openpose
+├── flownet.pkl
+```
+### 2. Requirements
+
+```shell
+conda create -n controlvideo python=3.10
+conda activate controlvideo
+pip install -r requirements.txt
+```
+`xformers` is recommended to save memory and running time.
+
+## Inference
+
+To perform text-to-video generation, just run this command in `inference.sh`:
+```bash
+python inference.py \
+    --prompt "A striking mallard floats effortlessly on the sparkling pond." \
+    --video_path "data/mallard-water.mp4" \
+    --output_path "outputs/" \
+    --video_length 15 \
+    --smoother_steps 19 20 \
+    # --is_long_video
+```
+where `--video_length` is the length of synthesized video, `--smoother_steps` determines at which timesteps to perform smoothing, `--is_long_video` denotes whether to enable efficient long-video synthesis.
 
 ## Visualizations
 
@@ -35,8 +73,8 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 </tr>
 <tr>
   <td width=30% align="center">"A sleek boat glides effortlessly through the shimmering river, van gogh style."</td>
-  <td width=30% align="center">"A majestic sailing boat cruises along the vast, azure_sea."</td>
-  <td width=30% align="center">"A contented cow ambles across the_dewy, verdant pasture."</td>
+  <td width=30% align="center">"A majestic sailing boat cruises along the vast, azure sea."</td>
+  <td width=30% align="center">"A contented cow ambles across the dewy, verdant pasture."</td>
 </tr>
 </table>
 
@@ -51,7 +89,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 <tr>
   <td width=30% align="center">"A young man riding a sleek, black motorbike through the winding mountain roads."</td>
   <td width=30% align="center">"A white swan movingon the lake, cartoon style."</td>
-  <td width=30% align="center">"An astronaut dancing in the outer space"</td>
+  <td width=30% align="center">"A dusty old jeep was making its way down the winding forest road, creaking and groaning with each bump and turn."</td>
 </tr>
  <tr>
   <td width=30% align="center"><img src="assets/canny/A_shiny_red_jeep_smoothly_turns_on_a_narrow,_winding_road_in_the_mountains..gif" raw=true></td>
@@ -94,3 +132,19 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
   <td width=40% align="center">"Hulk is dancing on the beach, cartoon style."</td>
 </tr>
 </table>
+
+## Citation
+If you make use of our work, please cite our paper.
+```bibtex
+@article{zhang2023controlvideo,
+  title={ControlVideo: Training-free Controllable Text-to-Video Generation},
+  author={Zhang, Yabo and Wei, Yuxiang and Jiang, Dongsheng and Zhang, Xiaopeng and Zuo, Wangmeng and Tian, Qi},
+  journal={arXiv preprint arXiv:2305.13077},
+  year={2023}
+}
+```
+
+## Acknowledgement
+This work repository borrows heavily from [Diffusers](https://github.com/huggingface/diffusers), [ControlNet](https://github.com/lllyasviel/ControlNet), [Tune-A-Video](https://github.com/showlab/Tune-A-Video), and [RIFE](https://github.com/megvii-research/ECCV2022-RIFE).
+
+There are also many interesting works on video generation: [Tune-A-Video](https://github.com/showlab/Tune-A-Video), [Text2Video-Zero](https://github.com/Picsart-AI-Research/Text2Video-Zero), [Follow-Your-Pose](https://github.com/mayuelala/FollowYourPose), [Control-A-Video](https://github.com/Weifeng-Chen/control-a-video), et al.
