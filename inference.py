@@ -3,9 +3,16 @@ import numpy as np
 import argparse
 import imageio
 import torch
+
 from einops import rearrange
 from diffusers import DDIMScheduler, AutoencoderKL
 from transformers import CLIPTextModel, CLIPTokenizer
+# from annotator.canny import CannyDetector
+# from annotator.openpose import OpenposeDetector
+# from annotator.midas import MidasDetector
+# import sys
+# sys.path.insert(0, ".")
+import controlnet_aux
 from controlnet_aux import OpenposeDetector, CannyDetector, MidasDetector
 
 from models.pipeline_controlvideo import ControlVideoPipeline
@@ -53,10 +60,10 @@ if __name__ == "__main__":
     args = get_args()
     os.makedirs(args.output_path, exist_ok=True)
 
-    if args.condition == "canny":
-        annotator = controlnet_parser_dict[args.condition]()
-    else:
-        annotator = controlnet_parser_dict[args.condition].from_pretrained("lllyasviel/ControlNet")
+    # if args.condition == "canny":
+    annotator = controlnet_parser_dict[args.condition]()
+    # else:
+    #     annotator = controlnet_parser_dict[args.condition].from_pretrained("lllyasviel/ControlNet")
 
     tokenizer = CLIPTokenizer.from_pretrained(sd_path, subfolder="tokenizer")
     text_encoder = CLIPTextModel.from_pretrained(sd_path, subfolder="text_encoder").to(dtype=torch.float16)
@@ -87,7 +94,7 @@ if __name__ == "__main__":
 
     # Step 2. Parse a video to conditional frames
     pil_annotation = get_annotation(video, annotator)
-    if args.condition == "depth":
+    if args.condition == "depth" and controlnet_aux.__version__ == '0.0.1':
         pil_annotation = [pil_annot[0] for pil_annot in pil_annotation]
 
     # Save condition video

@@ -10,6 +10,7 @@ import PIL
 from typing import List
 from tqdm import tqdm
 from einops import rearrange
+
 from controlnet_aux import CannyDetector
 
 def save_videos_grid(videos: torch.Tensor, path: str, rescale=False, n_rows=4, fps=8):
