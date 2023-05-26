@@ -21,7 +21,7 @@ The `flownet.pkl` is the weights of [RIFE](https://github.com/megvii-research/EC
 The final file tree likes:
 
 ```none
-datasets
+checkpoints
 ├── stable-diffusion-v1-5
 ├── sd-controlnet-canny
 ├── sd-controlnet-depth
