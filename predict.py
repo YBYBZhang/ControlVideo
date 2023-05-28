@@ -101,6 +101,8 @@ class Predictor(BasePredictor):
         """Run a single prediction on the model"""
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
+        else:
+            seed = int(seed)
         print(f"Using seed: {seed}")
 
         generator = torch.Generator(device="cuda")
