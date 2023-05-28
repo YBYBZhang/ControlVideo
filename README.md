@@ -14,6 +14,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 
 ## News
 
+* [05/28/2023] Thanks [chenxwh](https://github.com/chenxwh), add a [Replicate demo](https://replicate.com/cjwbw/controlvideo)!
 * [05/25/2023] Code [ControlVideo](https://github.com/YBYBZhang/ControlVideo/) released!
 * [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/2305.13077) released!
 
