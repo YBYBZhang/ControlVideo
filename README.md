@@ -4,6 +4,8 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 
 [![arXiv](https://img.shields.io/badge/arXiv-2305.13077-b31b1b.svg)](https://arxiv.org/abs/2305.13077)
 ![visitors](https://visitor-badge.laobi.icu/badge?page_id=YBYBZhang/ControlVideo)
+[![Replicate](https://replicate.com/cjwbw/controlvideo/badge)](https://replicate.com/cjwbw/controlvideo) 
+
 <p align="center">
 <img src="assets/overview.png" width="1080px"/> 
 <br>
