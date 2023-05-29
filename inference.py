@@ -12,8 +12,10 @@ from transformers import CLIPTextModel, CLIPTokenizer
 # from annotator.midas import MidasDetector
 # import sys
 # sys.path.insert(0, ".")
+from huggingface_hub import hf_hub_download
 import controlnet_aux
 from controlnet_aux import OpenposeDetector, CannyDetector, MidasDetector
+from controlnet_aux.open_pose.body import Body
 
 from models.pipeline_controlvideo import ControlVideoPipeline
 from models.util import save_videos_grid, read_video, get_annotation
@@ -36,7 +38,7 @@ controlnet_parser_dict = {
     "depth": MidasDetector,
     "canny": CannyDetector,
 }
-  
+
 POS_PROMPT = " ,best quality, extremely detailed, HD, ultra-realistic, 8K, HQ, masterpiece, trending on artstation, art, smooth"
 NEG_PROMPT = "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer difits, cropped, worst quality, low quality, deformed body, bloated, ugly, unrealistic"
 
@@ -60,10 +62,13 @@ if __name__ == "__main__":
     args = get_args()
     os.makedirs(args.output_path, exist_ok=True)
 
-    # if args.condition == "canny":
-    annotator = controlnet_parser_dict[args.condition]()
-    # else:
-    #     annotator = controlnet_parser_dict[args.condition].from_pretrained("lllyasviel/ControlNet")
+    if args.condition == "pose":
+        pretrained_model_or_path = "lllyasviel/ControlNet"
+        body_model_path = hf_hub_download(pretrained_model_or_path, "annotator/ckpts/body_pose_model.pth", cache_dir="checkpoints")
+        body_estimation = Body(body_model_path)
+        annotator = controlnet_parser_dict[args.condition](body_estimation)
+    else:
+        annotator = controlnet_parser_dict[args.condition]()
 
     tokenizer = CLIPTokenizer.from_pretrained(sd_path, subfolder="tokenizer")
     text_encoder = CLIPTextModel.from_pretrained(sd_path, subfolder="text_encoder").to(dtype=torch.float16)
