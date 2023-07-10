@@ -41,8 +41,10 @@ def save_videos_grid_pil(videos: List[PIL.Image.Image], path: str, rescale=False
     os.makedirs(os.path.dirname(path), exist_ok=True)
     imageio.mimsave(path, outputs, fps=fps)
 
-def read_video(video_path, video_length, width=512, height=512, frame_rate=2):
+def read_video(video_path, video_length, width=512, height=512, frame_rate=None):
     vr = decord.VideoReader(video_path, width=width, height=height)
+    if frame_rate is None:
+        frame_rate = max(1, len(vr) // video_length)
     sample_index = list(range(0, len(vr), frame_rate))[:video_length]
     video = vr.get_batch(sample_index)
     video = rearrange(video, "f h w c -> f c h w")
