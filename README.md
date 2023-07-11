@@ -13,7 +13,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 </p>
 
 ## News
-
+* [07/11/2023] Support [ControlNet 1.1](https://github.com/lllyasviel/ControlNet-v1-1-nightly) based version! 
 * [05/28/2023] Thanks [chenxwh](https://github.com/chenxwh), add a [Replicate demo](https://replicate.com/cjwbw/controlvideo)!
 * [05/25/2023] Code [ControlVideo](https://github.com/YBYBZhang/ControlVideo/) released!
 * [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/2305.13077) released!
@@ -21,7 +21,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 ## Setup
 
 ### 1. Download Weights
-All pre-trained weights are downloaded to `checkpoints/` directory, including the pre-trained weights of [Stable Diffusion v1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5), ControlNet conditioned on [canny edges](https://huggingface.co/lllyasviel/sd-controlnet-canny), [depth maps](https://huggingface.co/lllyasviel/sd-controlnet-depth), [human poses](https://huggingface.co/lllyasviel/sd-controlnet-openpose). 
+All pre-trained weights are downloaded to `checkpoints/` directory, including the pre-trained weights of [Stable Diffusion v1.5](https://huggingface.co/runwayml/stable-diffusion-v1-5), ControlNet 1.0 conditioned on [canny edges](https://huggingface.co/lllyasviel/sd-controlnet-canny), [depth maps](https://huggingface.co/lllyasviel/sd-controlnet-depth), [human poses](https://huggingface.co/lllyasviel/sd-controlnet-openpose), and ControlNet 1.1 in [here](https://huggingface.co/lllyasviel). 
 The `flownet.pkl` is the weights of [RIFE](https://github.com/megvii-research/ECCV2022-RIFE).
 The final file tree likes:
 
@@ -31,6 +31,7 @@ checkpoints
 ├── sd-controlnet-canny
 ├── sd-controlnet-depth
 ├── sd-controlnet-openpose
+├── ...
 ├── flownet.pkl
 ```
 ### 2. Requirements
@@ -40,7 +41,7 @@ conda create -n controlvideo python=3.10
 conda activate controlvideo
 pip install -r requirements.txt
 ```
-`xformers` is recommended to save memory and running time.
+Note: `xformers` is recommended to save memory and running time. `controlnet-aux` is updated to version 0.0.6.
 
 ## Inference
 
@@ -55,10 +56,12 @@ python inference.py \
     --smoother_steps 19 20 \
     --width 512 \
     --height 512 \
+    --frame_rate 2 \
+    --version v10 \
     # --is_long_video
 ```
 where `--video_length` is the length of synthesized video, `--condition` represents the type of structure sequence,
-`--smoother_steps` determines at which timesteps to perform smoothing, and `--is_long_video` denotes whether to enable efficient long-video synthesis.
+`--smoother_steps` determines at which timesteps to perform smoothing, `--version` selects the version of ControlNet (e.g., `v10` or `v11`), and `--is_long_video` denotes whether to enable efficient long-video synthesis.
 
 ## Visualizations
 

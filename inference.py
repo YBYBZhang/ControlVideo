@@ -7,18 +7,12 @@ import torch
 from einops import rearrange
 from diffusers import DDIMScheduler, AutoencoderKL
 from transformers import CLIPTextModel, CLIPTokenizer
-# from annotator.canny import CannyDetector
-# from annotator.openpose import OpenposeDetector
-# from annotator.midas import MidasDetector
-# import sys
-# sys.path.insert(0, ".")
-from huggingface_hub import hf_hub_download
-import controlnet_aux
-from controlnet_aux import OpenposeDetector, CannyDetector, MidasDetector
-from controlnet_aux.open_pose.body import Body
+
+import torchvision
+from controlnet_aux.processor import Processor
 
 from models.pipeline_controlvideo import ControlVideoPipeline
-from models.util import save_videos_grid, read_video, get_annotation
+from models.util import save_videos_grid, read_video
 from models.unet import UNet3DConditionModel
 from models.controlnet import ControlNetModel3D
 from models.RIFE.IFNet_HDv3 import IFNet
@@ -27,17 +21,42 @@ from models.RIFE.IFNet_HDv3 import IFNet
 device = "cuda"
 sd_path = "checkpoints/stable-diffusion-v1-5"
 inter_path = "checkpoints/flownet.pkl"
-controlnet_dict = {
-    "pose": "checkpoints/sd-controlnet-openpose",
-    "depth": "checkpoints/sd-controlnet-depth",
-    "canny": "checkpoints/sd-controlnet-canny",
+controlnet_dict_version = {
+    "v10":{
+        "openpose": "checkpoints/sd-controlnet-openpose",
+        "depth_midas": "checkpoints/sd-controlnet-depth",
+        "canny": "checkpoints/sd-controlnet-canny",
+    },
+    "v11": {
+    "softedge_pidinet": "checkpoints/control_v11p_sd15_softedge",
+    "softedge_pidsafe": "checkpoints/control_v11p_sd15_softedge",
+    "softedge_hed": "checkpoints/control_v11p_sd15_softedge",
+    "softedge_hedsafe": "checkpoints/control_v11p_sd15_softedge",
+    "scribble_hed": "checkpoints/control_v11p_sd15_scribble",
+    "scribble_pidinet": "checkpoints/control_v11p_sd15_scribble",
+    "lineart_anime": "checkpoints/control_v11p_sd15_lineart_anime",
+    "lineart_coarse": "checkpoints/control_v11p_sd15_lineart",
+    "lineart_realistic": "checkpoints/control_v11p_sd15_lineart",
+    "depth_midas": "checkpoints/control_v11f1p_sd15_depth",
+    "depth_leres": "checkpoints/control_v11f1p_sd15_depth",
+    "depth_leres++": "checkpoints/control_v11f1p_sd15_depth",
+    "depth_zoe": "checkpoints/control_v11f1p_sd15_depth",
+    "canny": "checkpoints/control_v11p_sd15_canny",
+    "openpose": "checkpoints/control_v11p_sd15_openpose",
+    "openpose_face": "checkpoints/control_v11p_sd15_openpose",
+    "openpose_faceonly": "checkpoints/control_v11p_sd15_openpose",
+    "openpose_full": "checkpoints/control_v11p_sd15_openpose",
+    "openpose_hand": "checkpoints/control_v11p_sd15_openpose",
+    "normal_bae": "checkpoints/control_v11p_sd15_normalbae"
+    }
 }
-
-controlnet_parser_dict = {
-    "pose": OpenposeDetector,
-    "depth": MidasDetector,
-    "canny": CannyDetector,
-}
+# load processor from processor_id
+# options are:
+# ["canny", "depth_leres", "depth_leres++", "depth_midas", "depth_zoe", "lineart_anime",
+#  "lineart_coarse", "lineart_realistic", "mediapipe_face", "mlsd", "normal_bae", "normal_midas",
+#  "openpose", "openpose_face", "openpose_faceonly", "openpose_full", "openpose_hand",
+#  "scribble_hed, "scribble_pidinet", "shuffle", "softedge_hed", "softedge_hedsafe",
+#  "softedge_pidinet", "softedge_pidsafe"]
 
 POS_PROMPT = " ,best quality, extremely detailed, HD, ultra-realistic, 8K, HQ, masterpiece, trending on artstation, art, smooth"
 NEG_PROMPT = "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer difits, cropped, worst quality, low quality, deformed body, bloated, ugly, unrealistic"
@@ -56,6 +75,8 @@ def get_args():
     parser.add_argument("--smoother_steps", nargs='+', default=[19, 20], type=int, help="Timesteps at which using interleaved-frame smoother")
     parser.add_argument("--is_long_video", action='store_true', help="Whether to use hierarchical sampler to produce long video")
     parser.add_argument("--seed", type=int, default=42, help="Random seed of generator")
+    parser.add_argument("--version", type=str, default='v10', choices=["v10", "v11"], help="Version of ControlNet")
+    parser.add_argument("--frame_rate", type=int, default=None, help="The frame rate of loading input video. Default rate is computed according to video length.")
     
     args = parser.parse_args()
     return args
@@ -68,14 +89,9 @@ if __name__ == "__main__":
     args.height = (args.height // 32) * 32    
     args.width = (args.width // 32) * 32    
 
-    if args.condition == "pose":
-        pretrained_model_or_path = "lllyasviel/ControlNet"
-        body_model_path = hf_hub_download(pretrained_model_or_path, "annotator/ckpts/body_pose_model.pth", cache_dir="checkpoints")
-        body_estimation = Body(body_model_path)
-        annotator = controlnet_parser_dict[args.condition](body_estimation)
-    else:
-        annotator = controlnet_parser_dict[args.condition]()
-
+    processor = Processor(args.condition)
+    controlnet_dict = controlnet_dict_version[args.version]
+    
     tokenizer = CLIPTokenizer.from_pretrained(sd_path, subfolder="tokenizer")
     text_encoder = CLIPTextModel.from_pretrained(sd_path, subfolder="text_encoder").to(dtype=torch.float16)
     vae = AutoencoderKL.from_pretrained(sd_path, subfolder="vae").to(dtype=torch.float16)
@@ -96,7 +112,7 @@ if __name__ == "__main__":
     generator.manual_seed(args.seed)
 
     # Step 1. Read a video
-    video = read_video(video_path=args.video_path, video_length=args.video_length, width=args.width, height=args.height)
+    video = read_video(video_path=args.video_path, video_length=args.video_length, width=args.width, height=args.height, frame_rate=args.frame_rate)
 
     # Save source video
     original_pixels = rearrange(video, "(b f) c h w -> b c f h w", b=1)
@@ -104,16 +120,18 @@ if __name__ == "__main__":
 
 
     # Step 2. Parse a video to conditional frames
-    pil_annotation = get_annotation(video, annotator)
-    if args.condition == "depth" and controlnet_aux.__version__ == '0.0.1':
-        pil_annotation = [pil_annot[0] for pil_annot in pil_annotation]
+    t2i_transform = torchvision.transforms.ToPILImage()
+    pil_annotation = []
+    for frame in video:
+        pil_frame = t2i_transform(frame)
+        pil_annotation.append(processor(pil_frame, to_pil=True))
 
     # Save condition video
     video_cond = [np.array(p).astype(np.uint8) for p in pil_annotation]
     imageio.mimsave(os.path.join(args.output_path, f"{args.condition}_condition.mp4"), video_cond, fps=8)
 
     # Reduce memory (optional)
-    del annotator; torch.cuda.empty_cache()
+    del processor; torch.cuda.empty_cache()
 
     # Step 3. inference
 
