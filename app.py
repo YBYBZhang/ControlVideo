@@ -27,9 +27,9 @@ model_ids = [
 ]
 
 
-# for model_id in model_ids:
-#     model_name = model_id.split('/')[-1]
-#     snapshot_download(model_id, cache_dir=f'checkpoints/{model_name}')
+for model_id in model_ids:
+    model_name = model_id.split('/')[-1]
+    snapshot_download(model_id, cache_dir=f'checkpoints/{model_name}')
 
 def load_model(model_id):
     local_dir = f'checkpoints/stable-diffusion-v1-5'

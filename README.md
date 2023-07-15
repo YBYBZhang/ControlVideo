@@ -4,6 +4,7 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 
 [![arXiv](https://img.shields.io/badge/arXiv-2305.13077-b31b1b.svg)](https://arxiv.org/abs/2305.13077)
 ![visitors](https://visitor-badge.laobi.icu/badge?page_id=YBYBZhang/ControlVideo)
+[![HuggingFace demo](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/Yabo/ControlVideo)
 [![Replicate](https://replicate.com/cjwbw/controlvideo/badge)](https://replicate.com/cjwbw/controlvideo) 
 
 <p align="center">
@@ -13,8 +14,9 @@ Official pytorch implementation of "ControlVideo: Training-free Controllable Tex
 </p>
 
 ## News
+* [07/16/2023] Add [HuggingFace demo](https://huggingface.co/spaces/Yabo/ControlVideo)!
 * [07/11/2023] Support [ControlNet 1.1](https://github.com/lllyasviel/ControlNet-v1-1-nightly) based version! 
-* [05/28/2023] Thanks [chenxwh](https://github.com/chenxwh), add a [Replicate demo](https://replicate.com/cjwbw/controlvideo)!
+* [05/28/2023] Thank [chenxwh](https://github.com/chenxwh), add a [Replicate demo](https://replicate.com/cjwbw/controlvideo)!
 * [05/25/2023] Code [ControlVideo](https://github.com/YBYBZhang/ControlVideo/) released!
 * [05/23/2023] Paper [ControlVideo](https://arxiv.org/abs/2305.13077) released!
 
@@ -158,5 +160,7 @@ If you make use of our work, please cite our paper.
 
 ## Acknowledgement
 This work repository borrows heavily from [Diffusers](https://github.com/huggingface/diffusers), [ControlNet](https://github.com/lllyasviel/ControlNet), [Tune-A-Video](https://github.com/showlab/Tune-A-Video), and [RIFE](https://github.com/megvii-research/ECCV2022-RIFE).
+The code of HuggingFace demo borrows from [fffiloni/ControlVideo](https://huggingface.co/spaces/fffiloni/ControlVideo).
+Thanks for their contributions!
 
 There are also many interesting works on video generation: [Tune-A-Video](https://github.com/showlab/Tune-A-Video), [Text2Video-Zero](https://github.com/Picsart-AI-Research/Text2Video-Zero), [Follow-Your-Pose](https://github.com/mayuelala/FollowYourPose), [Control-A-Video](https://github.com/Weifeng-Chen/control-a-video), et al.
