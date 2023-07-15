@@ -77,6 +77,7 @@ def get_args():
     parser.add_argument("--seed", type=int, default=42, help="Random seed of generator")
     parser.add_argument("--version", type=str, default='v10', choices=["v10", "v11"], help="Version of ControlNet")
     parser.add_argument("--frame_rate", type=int, default=None, help="The frame rate of loading input video. Default rate is computed according to video length.")
+    parser.add_argument("--temp_video_name", type=str, default=None, help="Default video name")
     
     args = parser.parse_args()
     return args
@@ -148,4 +149,5 @@ if __name__ == "__main__":
                     generator=generator, guidance_scale=12.5, negative_prompt=NEG_PROMPT,
                     width=args.width, height=args.height
                 ).videos
-    save_videos_grid(sample, f"{args.output_path}/{args.prompt}.mp4")
+    args.temp_video_name = args.prompt if args.temp_video_name is None else args.temp_video_name
+    save_videos_grid(sample, f"{args.output_path}/{args.temp_video_name}.mp4")
