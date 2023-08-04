@@ -2,7 +2,7 @@ accelerate==0.17.1
 addict==2.4.0
 basicsr==1.4.2
 bitsandbytes==0.35.4
-clip==1.0
+clip
 cmake==3.25.2
 controlnet-aux==0.0.6
 decord==0.6.0
@@ -29,8 +29,8 @@ termcolor==2.2.0
 thinc==8.1.10
 timm==0.6.12
 tokenizers==0.13.2
-torch==1.13.1+cu116
-torchvision==0.14.1+cu116
+# torch==1.13.1+cu116
+# torchvision==0.14.1+cu116
 tqdm==4.64.1
 transformers==4.26.1
 wandb==0.13.10
