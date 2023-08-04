@@ -36,3 +36,8 @@ transformers==4.26.1
 wandb==0.13.10
 xformers==0.0.16
 modelcards
+triton==2.0.0.post1
+positional_encodings
+params_proto
+termcolor
+ml_logger
