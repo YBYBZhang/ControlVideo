@@ -2,7 +2,7 @@ accelerate==0.17.1
 addict==2.4.0
 basicsr==1.4.2
 bitsandbytes==0.35.4
-clip==1.0
+clip==0.1.0
 cmake==3.25.2
 controlnet-aux==0.0.6
 decord==0.6.0
