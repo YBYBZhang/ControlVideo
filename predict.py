@@ -33,7 +33,7 @@ controlnet_parser_dict = {
     "canny": CannyDetector,
 }
 
-POS_PROMPT = " ,best quality, extremely detailed, HD, ultra-realistic, 8K, HQ, masterpiece, trending on artstation, art, smooth"
+POS_PROMPT = "best quality, extremely detailed, HD, ultra-realistic, 8K, high quality, masterpiece, trending on artstation, art"
 NEG_PROMPT = "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer difits, cropped, worst quality, low quality, deformed body, bloated, ugly, unrealistic"
 
 
