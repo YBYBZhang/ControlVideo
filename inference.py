@@ -47,9 +47,10 @@ class Lucid(PrefixProto):
     """
 
     prompt: str = ""
-    condition: str = "canny"
     video_path: str = ""
     output_path: str = ""
+    sample_vid_name: str = ""
+    condition: str = "canny"
     video_length: int = 50
     smoother_steps: list = [19, 20]
     width: int = 512
@@ -58,7 +59,7 @@ class Lucid(PrefixProto):
     is_long_video: bool = False
     seed: int = 101
 
-# def get_args():
+# def get_Lucid():
 #     parser = argparse.ArgumentParser()
 #     parser.add_argument("--prompt", Text description of target video
 #     parser.add_argument("--video_path", Path to a source video
@@ -67,35 +68,36 @@ class Lucid(PrefixProto):
 #     parser.add_argument("--video_length", Length of synthesized video
 #     parser.add_argument("--height", type=Height of synthesized video, and should be a multiple of 32
 #     parser.add_argument("--width", type=Width of synthesized video, and should be a multiple of 32
-#     parser.add_argument("--smoother_steps", nargs='+', default=[19, Timesteps at which using interleaved-frame smoother
+#     parser.add_argument("--smoother_steps", nLucid='+', default=[19, Timesteps at which using interleaved-frame smoother
 #     parser.add_argument("--Whether to use hierarchical sampler to produce long video
 #     parser.add_argument("--seed", Random seed of generator
 #     parser.add_argument("--frame_rate", type=The frame rate of loading input video. Default rate is computed according to video length.
-#     parser.add_argument("--temp_video_name", Default video name
+#     parser.add_argument("--sample_vid_name", Default video name
 #
-#     args = parser.parse_args()
-#     return args
+#     Lucid = parser.parse_Lucid()
+#     return Lucid
 
 
 if __name__ == "__main__":
     Lucid.prompt = "Walking over stairs, first-person view, no background, no tree, blue sky and sun."
-    Lucid.video_path = "data/channel_rgb.mp4"
-    Lucid.output_path = "outputs/"
+    Lucid.video_path = "data/log2.mp4"
+    Lucid.output_path = "Lucid_sim"
+    Lucid.sample_vid_name = "sample001"
 
-    os.makedirs(args.output_path, exist_ok=True)
+    os.makedirs(Lucid.output_path, exist_ok=True)
 
     # Height and width should be a multiple of 32
-    args.height = (args.height // 32) * 32
-    args.width = (args.width // 32) * 32
+    Lucid.height = (Lucid.height // 32) * 32
+    Lucid.width = (Lucid.width // 32) * 32
 
-    processor = Processor(args.condition)
-    # controlnet_dict = controlnet_dict_version[args.version]
+    processor = Processor(Lucid.condition)
+    # controlnet_dict = controlnet_dict_version[Lucid.version]
 
     tokenizer = CLIPTokenizer.from_pretrained(sd_path, subfolder="tokenizer")
     text_encoder = CLIPTextModel.from_pretrained(sd_path, subfolder="text_encoder").to(dtype=torch.float16)
     vae = AutoencoderKL.from_pretrained(sd_path, subfolder="vae").to(dtype=torch.float16)
     unet = UNet3DConditionModel.from_pretrained_2d(sd_path, subfolder="unet").to(dtype=torch.float16)
-    controlnet = ControlNetModel3D.from_pretrained_2d(controlnet_dict[args.condition]).to(dtype=torch.float16)
+    controlnet = ControlNetModel3D.from_pretrained_2d(controlnet_dict[Lucid.condition]).to(dtype=torch.float16)
     interpolater = IFNet(ckpt_path=inter_path).to(dtype=torch.float16)
     scheduler = DDIMScheduler.from_pretrained(sd_path, subfolder="scheduler")
 
@@ -108,15 +110,15 @@ if __name__ == "__main__":
     pipe.to(device)
 
     generator = torch.Generator(device="cuda")
-    generator.manual_seed(args.seed)
+    generator.manual_seed(Lucid.seed)
 
     # Step 1. Read a video
-    video = read_video(video_path=args.video_path, video_length=args.video_length, width=args.width, height=args.height,
-                       frame_rate=args.frame_rate)
+    video = read_video(video_path=Lucid.video_path, video_length=Lucid.video_length, width=Lucid.width, height=Lucid.height,
+                       frame_rate=Lucid.frame_rate)
 
     # Save source video
     original_pixels = rearrange(video, "(b f) c h w -> b c f h w", b=1)
-    save_videos_grid(original_pixels, os.path.join(args.output_path, "source_video.mp4"), rescale=True)
+    save_videos_grid(original_pixels, os.path.join(Lucid.output_path, "source_video.mp4"), rescale=True)
 
     # Step 2. Parse a video to conditional frames
     t2i_transform = torchvision.transforms.ToPILImage()
@@ -127,7 +129,7 @@ if __name__ == "__main__":
 
     # Save condition video
     video_cond = [np.array(p).astype(np.uint8) for p in pil_annotation]
-    imageio.mimsave(os.path.join(args.output_path, f"{args.condition}_condition.mp4"), video_cond, fps=8)
+    imageio.mimsave(os.path.join(Lucid.output_path, f"{Lucid.condition}_condition.mp4"), video_cond, fps=8)
 
     # Reduce memory (optional)
     del processor;
@@ -135,20 +137,19 @@ if __name__ == "__main__":
 
     # Step 3. inference
 
-    if args.is_long_video:
-        window_size = int(np.sqrt(args.video_length))
-        sample = pipe.generate_long_video(args.prompt + POS_PROMPT, video_length=args.video_length,
+    if Lucid.is_long_video:
+        window_size = int(np.sqrt(Lucid.video_length))
+        sample = pipe.generate_long_video(Lucid.prompt + POS_PROMPT, video_length=Lucid.video_length,
                                           frames=pil_annotation,
-                                          num_inference_steps=50, smooth_steps=args.smoother_steps,
+                                          num_inference_steps=50, smooth_steps=Lucid.smoother_steps,
                                           window_size=window_size,
                                           generator=generator, guidance_scale=12.5, negative_prompt=NEG_PROMPT,
-                                          width=args.width, height=args.height
+                                          width=Lucid.width, height=Lucid.height
                                           ).videos
     else:
-        sample = pipe(args.prompt + POS_PROMPT, video_length=args.video_length, frames=pil_annotation,
-                      num_inference_steps=50, smooth_steps=args.smoother_steps,
+        sample = pipe(Lucid.prompt + POS_PROMPT, video_length=Lucid.video_length, frames=pil_annotation,
+                      num_inference_steps=50, smooth_steps=Lucid.smoother_steps,
                       generator=generator, guidance_scale=12.5, negative_prompt=NEG_PROMPT,
-                      width=args.width, height=args.height
+                      width=Lucid.width, height=Lucid.height
                       ).videos
-    args.temp_video_name = args.prompt if args.temp_video_name is None else args.temp_video_name
-    save_videos_grid(sample, f"{args.output_path}/{args.temp_video_name}.mp4")
+    save_videos_grid(sample, f"{Lucid.output_path}/{Lucid.sample_vid_name}.mp4")
