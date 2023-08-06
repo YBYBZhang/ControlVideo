@@ -18,7 +18,7 @@ model_ids = [
     'lllyasviel/sd-controlnet-openpose',
     "lllyasviel/control_v11p_sd15_softedge",
     "lllyasviel/control_v11p_sd15_scribble",
-    "lllyasviel/control_v11p_sd15_lineart_anime",
+    "lllyasviel/control_v11p_sd15s2_lineart_anime",
     "lllyasviel/control_v11p_sd15_lineart",
     "lllyasviel/control_v11f1p_sd15_depth",
     "lllyasviel/control_v11p_sd15_canny",
@@ -345,4 +345,4 @@ with gr.Blocks(css=css) as demo:
                             ],
                     outputs=video_res)
 
-demo.queue(max_size=12).launch()
+demo.queue(max_size=12).launch(share=True)

@@ -19,7 +19,6 @@ from models.controlnet import ControlNetModel3D
 from models.RIFE.IFNet_HDv3 import IFNet
 from cog import BasePredictor, Input, Path
 
-
 sd_path = "checkpoints/stable-diffusion-v1-5"
 inter_path = "checkpoints/flownet.pkl"
 controlnet_dict = {

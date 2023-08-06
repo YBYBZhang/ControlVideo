@@ -38,6 +38,7 @@ xformers==0.0.16
 modelcards
 triton==2.0.0.post1
 positional_encodings
+mediapipe
 params_proto
 termcolor
 ml_logger

@@ -1,12 +1,12 @@
 python inference.py \
-    --prompt "A striking mallard floats effortlessly on the sparkling pond." \
-    --condition "depth_midas" \
-    --video_path "data/mallard-water.mp4" \
+    --prompt "Walking over stairs, first-person view, no background, no tree, blue sky and sun." \
+    --condition "canny" \
+    --video_path "data/channel_rgb.mp4" \
     --output_path "outputs/" \
-    --video_length 15 \
+    --video_length 50 \
     --smoother_steps 19 20 \
-    --width 512 \
-    --height 512 \
+    --width 256 \
+    --height 256 \
     --frame_rate 2 \
     --version v10 \
-    # --is_long_video
+    --is_long_video
