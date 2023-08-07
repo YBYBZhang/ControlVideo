@@ -11,10 +11,12 @@ ALLOWED_TYPES = {
 
 sky = [
     "blue sky",
+    "grey sky",
     "cloudy",
     "clouds",
     "sunlight"
     "sun",
+    "no sun",
 ]
 
 material = [
@@ -61,6 +63,3 @@ def prompt_gen():
     prompt = ', '.join(
         [random.choice(sky), random.choice(material), random.choice(texture), random.choice(lighting)])
     return prompt
-
-
-print(prompt_gen())

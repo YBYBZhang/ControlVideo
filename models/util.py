@@ -13,7 +13,10 @@ from einops import rearrange
 
 from controlnet_aux import CannyDetector
 
-def save_videos_grid(videos: torch.Tensor, path: str, rescale=False, n_rows=4, fps=50):
+def save_videos_grid(videos: torch.Tensor, path: str, rescale=False, n_rows=4, fps=50, ret_images=None):
+    '''
+    Saves a grid of videos to a file AND returns list of numpy arrays.
+    '''
     videos = rearrange(videos, "b c t h w -> t b c h w")
     outputs = []
     for x in videos:
@@ -26,6 +29,9 @@ def save_videos_grid(videos: torch.Tensor, path: str, rescale=False, n_rows=4, f
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
     imageio.mimsave(path, outputs, fps=fps)
+
+    if ret_images:
+        return outputs
 
 def save_videos_grid_pil(videos: List[PIL.Image.Image], path: str, rescale=False, n_rows=4, fps=8):
     videos = rearrange(videos, "b c t h w -> t b c h w")

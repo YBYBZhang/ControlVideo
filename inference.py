@@ -20,13 +20,13 @@ from models.RIFE.IFNet_HDv3 import IFNet
 from params_proto import PrefixProto, Flag
 
 device = "cuda"
-sd_path = "checkpoints/stable-diffusion-v1-5"
+sd_path = "../models/stable-diffusion-v1-5"
 inter_path = "checkpoints/flownet.pkl"
 controlnet_dict = {
-    "openpose": "checkpoints/sd-controlnet-openpose",
-    "depth_midas": "checkpoints/sd-controlnet-depth",
-    "canny": "checkpoints/sd-controlnet-canny",
-    "lineart_coarse": "checkpoints/control_v11p_sd15_lineart",
+    "openpose": "../models/sd-controlnet-openpose",
+    "depth_midas": "../models/sd-controlnet-depth",
+    "canny": "../models/sd-controlnet-canny",
+    "lineart_coarse": "../models/control_v11p_sd15_lineart",
 }
 
 POS_PROMPT = "best quality, extremely detailed, HD, realistic, 8K, masterpiece, trending on artstation, art, smooth"
@@ -64,16 +64,35 @@ class Lucid(PrefixProto):
     guidance_scale: float = 12.5
 
 
-if __name__ == "__main__":
-    Lucid.prompt = "Walking over stairs, first-person view, no background, no tree, blue sky, sun, sharp stair edges."
-    Lucid.video_path = "data/channel_edges.mp4"
-    Lucid.output_path = "Lucid_sim/test6"
-    Lucid.sample_vid_name = "result"
+def logger_save_vids(videos: torch.Tensor, env_name: str, sample_root: str, rescale=False, n_rows=4, fps=50):
+    '''
+    Saves a grid of videos to a file AND returns list of numpy arrays.
+    '''
+    from ml_logger import logger
+    videos = rearrange(videos, "b c t h w -> t b c h w")
+    outputs = []
+    for x in videos:
+        x = torchvision.utils.make_grid(x, nrow=n_rows)
+        x = x.transpose(0, 1).transpose(1, 2).squeeze(-1)
+        if rescale:
+            x = (x + 1.0) / 2.0  # -1,1 -> 0,1
+        x = (x * 255).numpy().astype(np.uint8)
+        outputs.append(x)
+
+    logger.save_video(outputs, os.path.join(env_name, sample_root), fps=fps)
+    return outputs
+
+
+def generate(prompt, video_path, env_name, sample_root, sample_vid_name):
+    from ml_logger import logger
+    Lucid.prompt = prompt
+    Lucid.video_path = video_path
+    Lucid.output_path = output_path
+    Lucid.sample_vid_name = sample_vid_name
 
     os.makedirs(Lucid.output_path, exist_ok=True)
     file_path = f"{Lucid.output_path}/info.txt"
     with open(file_path, "w") as file:
-        file.write("Trying with all 250 frames\n")
         file.write(json.dumps(Lucid.__dict__, indent=4))
 
     # Height and width should be a multiple of 32
@@ -135,7 +154,8 @@ if __name__ == "__main__":
                                           frames=pil_annotation,
                                           num_inference_steps=50, smooth_steps=Lucid.smoother_steps,
                                           window_size=window_size,
-                                          generator=generator, guidance_scale=Lucid.guidance_scale, negative_prompt=NEG_PROMPT,
+                                          generator=generator, guidance_scale=Lucid.guidance_scale,
+                                          negative_prompt=NEG_PROMPT,
                                           width=Lucid.width, height=Lucid.height
                                           ).videos
     else:
@@ -144,4 +164,19 @@ if __name__ == "__main__":
                       generator=generator, guidance_scale=Lucid.guidance_scale, negative_prompt=NEG_PROMPT,
                       width=Lucid.width, height=Lucid.height
                       ).videos
-    save_videos_grid(sample, f"{Lucid.output_path}/{Lucid.sample_vid_name}.mp4", fps=50)
+
+    # Save synthetic video
+    frames = logger_save_vids(sample, env_name, sample_root, fps=50, ret_images=True)
+
+    for frame_num, frame in enumerate(frames, start=1):
+        filename = f"{sample_vid_name}_{frame_num:03}.png"
+        logger.save_image(frame, f"{sample_vid_name}_{frame_num:03}.png")
+
+
+if __name__ == "__main__":
+    prompt = "Walking over stairs, first-person view, sharp stair edges, dark, cloudy, no sun, wood "  # + prompt_gen()
+    video_path = "data/channel_edges.mp4"
+    output_path = "Lucid_sim/test8"
+    sample_vid_name = "result"
+
+    generate(prompt, video_path, output_path, sample_vid_name)
