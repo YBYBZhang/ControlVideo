@@ -276,12 +276,12 @@ img[src*='#center'] {
 with gr.Blocks(css=css) as demo:
     with gr.Column(elem_id="col-container"):
         gr.Markdown("""
-            <h1 style="text-align: center;">ControlVideo: Training-free Controllable Text-to-Video Generation</h1>
+            <h1 style="text-align: center;">controlvideo: Training-free Controllable Text-to-Video Generation</h1>
             <p style="text-align: center;">
                 [<a href="https://arxiv.org/abs/2305.13077" style="color:blue;">arXiv</a>] 
                 [<a href="https://github.com/YBYBZhang/ControlVideo" style="color:blue;">GitHub</a>]
             </p>
-            <p style="text-align: center;"> ControlVideo adapts ControlNet to the video counterpart without any finetuning, aiming to directly inherit its high-quality and consistent generation. </p>            
+            <p style="text-align: center;"> controlvideo adapts ControlNet to the video counterpart without any finetuning, aiming to directly inherit its high-quality and consistent generation. </p>            
         """)
         
         with gr.Column():

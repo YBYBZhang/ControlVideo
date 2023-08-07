@@ -17,4 +17,4 @@ def video_to_images(input_vid):
     return images
 
 if __name__ == "__main__":
-    print(len(video_to_images("/Users/evan_kim/urop/ControlVideo/outputs/Walking over stairs, first-person view, no background, no tree, blue sky and sun. smalller.mp4")))
+    print(len(video_to_images("/Users/evan_kim/urop/controlvideo/outputs/Walking over stairs, first-person view, no background, no tree, blue sky and sun. smalller.mp4")))

@@ -704,7 +704,7 @@ class ControlVideoPipeline(DiffusionPipeline):
                 instead.
             frames (`List[torch.FloatTensor]`, `List[PIL.Image.Image]`,
                     `List[List[torch.FloatTensor]]`, or `List[List[PIL.Image.Image]]`):
-                The ControlVideo input condition. ControlVideo uses this input condition to generate guidance to Unet. If
+                The controlvideo input condition. controlvideo uses this input condition to generate guidance to Unet. If
                 the type is specified as `Torch.FloatTensor`, it is passed to ControlNet as is. `PIL.Image.Image` can
                 also be accepted as an image. The dimensions of the output image defaults to `image`'s dimensions. If
                 height and/or width are passed, `image` is resized according to them. If multiple ControlNets are
@@ -1027,7 +1027,7 @@ class ControlVideoPipeline(DiffusionPipeline):
                 instead.
             frames (`List[torch.FloatTensor]`, `List[PIL.Image.Image]`,
                     `List[List[torch.FloatTensor]]`, or `List[List[PIL.Image.Image]]`):
-                The ControlVideo input condition. ControlVideo uses this input condition to generate guidance to Unet. If
+                The controlvideo input condition. controlvideo uses this input condition to generate guidance to Unet. If
                 the type is specified as `Torch.FloatTensor`, it is passed to ControlNet as is. `PIL.Image.Image` can
                 also be accepted as an image. The dimensions of the output image defaults to `image`'s dimensions. If
                 height and/or width are passed, `image` is resized according to them. If multiple ControlNets are
